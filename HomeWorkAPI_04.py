@@ -6,7 +6,7 @@ import csv
 url = 'https://edu.gov.ru/press/news/'
 
 # Строка агента пользователя для имитации веб-браузера
-headers = {'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36'}
+headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36'}
 
 # Отправка HTTP GET-запроса
 response = requests.get(url, headers=headers)
@@ -31,7 +31,12 @@ if response.status_code == 200:
         for news in news_elements:
             # Извлечение данных новости из элемента
             title = news.xpath('.//a/text()')[0] if news.xpath('.//a/text()') else ''
-            description = news.xpath('.//p/text()')[0] if news.xpath('.//p/text()') else ''
+            if news.xpath('.//p/text()'):
+                description = news.xpath('.//p/text()')[0]
+            elif news.xpath('.//span[contains(@class, "s1")]/text()'):
+                description = news.xpath('.//span[contains(@class, "s1")]/text()')[0]
+            else:
+                description = ''
 
             # Запись данных в CSV-файл
             writer.writerow([title, description])
